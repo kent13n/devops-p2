@@ -1,22 +1,30 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MaterialModule } from '../../shared/material.module';
 import { UserService } from '../../core/service/user.service';
+import { AuthService } from '../../core/service/auth.service';
 import { LoginRequest } from '../../core/models/LoginRequest';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, MaterialModule],
+  imports: [CommonModule, MaterialModule, RouterLink],
   templateUrl: './login.component.html',
   standalone: true,
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
   private userService = inject(UserService);
+  private authService = inject(AuthService);
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+
   loginForm: FormGroup = new FormGroup({});
   submitted: boolean = false;
   loading: boolean = false;
@@ -49,11 +57,13 @@ export class LoginComponent implements OnInit {
       .subscribe({
         next: (token: string) => {
           this.loading = false;
-          alert('Connexion réussie ! Token : ' + token);
+          this.authService.saveToken(token);
+          this.snackBar.open('Connexion réussie !', 'Fermer', { duration: 3000 });
+          this.router.navigate(['/']);
         },
         error: (err) => {
           this.loading = false;
-          this.errorMessage = err.error || 'Erreur lors de la connexion';
+          this.errorMessage = err.error?.message || 'Erreur lors de la connexion';
         }
       });
   }

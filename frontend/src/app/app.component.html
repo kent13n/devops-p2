@@ -1,1 +1,7 @@
+@if (isLoggedIn) {
+  <nav class="navbar navbar-dark bg-dark mb-3">
+    <span class="navbar-brand">Gestion Étudiants</span>
+    <button class="btn btn-outline-light" (click)="logout()">Déconnexion</button>
+  </nav>
+}
 <router-outlet/>
