@@ -1,0 +1,13 @@
+<div class="card m-3">
+  <h5 class="card-header">Ajouter un étudiant</h5>
+  <div class="card-body">
+    @if (errorMessage) {
+      <div class="alert alert-danger">{{ errorMessage }}</div>
+    }
+    <app-student-form
+      [loading]="loading"
+      (formSubmit)="onSubmit($event)"
+      (formCancel)="onCancel()">
+    </app-student-form>
+  </div>
+</div>

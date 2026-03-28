@@ -1,0 +1,20 @@
+<div class="card m-3">
+  <h5 class="card-header">Modifier l'étudiant</h5>
+  <div class="card-body">
+    @if (errorMessage) {
+      <div class="alert alert-danger">{{ errorMessage }}</div>
+    }
+    @if (loadingStudent) {
+      <div class="text-center">
+        <span class="spinner-border"></span>
+      </div>
+    } @else if (student) {
+      <app-student-form
+        [student]="student"
+        [loading]="loading"
+        (formSubmit)="onSubmit($event)"
+        (formCancel)="onCancel()">
+      </app-student-form>
+    }
+  </div>
+</div>
