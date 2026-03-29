@@ -1,0 +1,5 @@
+{
+  "report-dir": "coverage/cypress",
+  "reporter": ["html", "text-summary"],
+  "exclude": ["cypress/**"]
+}

@@ -108,13 +108,6 @@ describe('Gestion des étudiants', () => {
     cy.contains(student.email).should('not.exist');
   });
 
-  it('devrait afficher un message si aucun étudiant', () => {
-    cy.login(user.login, user.password);
-    cy.visit('/students');
-
-    cy.contains('Aucun étudiant').should('be.visible');
-  });
-
   it('devrait afficher une erreur si le chargement de la liste échoue', () => {
     cy.login(user.login, user.password);
     cy.intercept('GET', '/api/students', { statusCode: 500, body: { message: 'Erreur serveur' } });
@@ -133,7 +126,6 @@ describe('Gestion des étudiants', () => {
   it('devrait afficher une erreur si la modification échoue', () => {
     cy.login(user.login, user.password);
 
-    // Créer un étudiant via l'API
     cy.window().then((win) => {
       const token = win.localStorage.getItem('jwt_token');
       cy.request({
@@ -144,7 +136,6 @@ describe('Gestion des étudiants', () => {
       }).then((res) => {
         const id = res.body.id;
 
-        // Intercepter le PUT pour simuler une erreur
         cy.intercept('PUT', `/api/students/${id}`, { statusCode: 400, body: { message: 'Email déjà utilisé' } });
         cy.visit(`/students/${id}/edit`);
 
@@ -152,7 +143,40 @@ describe('Gestion des étudiants', () => {
         cy.get('button').contains('Modifier').click();
 
         cy.get('.alert-danger').should('be.visible');
+
+        // Nettoyer l'étudiant créé pour ce test
+        cy.request({
+          method: 'DELETE',
+          url: `/api/students/${id}`,
+          headers: { Authorization: `Bearer ${token}` }
+        });
       });
     });
+  });
+
+  it('devrait afficher un message si aucun étudiant', () => {
+    cy.login(user.login, user.password);
+
+    // Nettoyer tous les étudiants restants
+    cy.window().then((win) => {
+      const token = win.localStorage.getItem('jwt_token');
+      cy.request({
+        method: 'GET',
+        url: '/api/students',
+        headers: { Authorization: `Bearer ${token}` }
+      }).then((res) => {
+        const students = res.body;
+        students.forEach((s: any) => {
+          cy.request({
+            method: 'DELETE',
+            url: `/api/students/${s.id}`,
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        });
+      });
+    });
+
+    cy.visit('/students');
+    cy.contains('Aucun étudiant').should('be.visible');
   });
 });

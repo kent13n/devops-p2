@@ -4,6 +4,7 @@ module.exports = {
   testMatch: ['**/+(*.)+(spec).+(ts|js)'],
   setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
   collectCoverage: true,
+  coverageDirectory: 'coverage/jest',
   coverageReporters: ['html', 'text-summary'],
   coverageThreshold: {
     global: {
