@@ -63,7 +63,7 @@ export class StudentListComponent implements OnInit, AfterViewInit {
       data: { message: `Supprimer l'étudiant ${student.firstName} ${student.lastName} ?` }
     });
 
-    dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((confirmed) => {
+    dialogRef.afterClosed().subscribe((confirmed) => {
       if (confirmed) {
         this.studentService.delete(student.id)
           .pipe(takeUntilDestroyed(this.destroyRef))
