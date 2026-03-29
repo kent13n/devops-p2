@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -13,6 +13,7 @@ describe('LoginComponent', () => {
   let fixture: ComponentFixture<LoginComponent>;
   let userServiceSpy: jest.Mocked<UserService>;
   let authServiceSpy: jest.Mocked<AuthService>;
+  let router: Router;
 
   beforeEach(async () => {
     userServiceSpy = { login: jest.fn() } as any;
@@ -32,6 +33,7 @@ describe('LoginComponent', () => {
 
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
@@ -40,20 +42,46 @@ describe('LoginComponent', () => {
   });
 
   it('should display login and password fields', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    const inputs = compiled.querySelectorAll('input');
+    const inputs = fixture.nativeElement.querySelectorAll('input');
     expect(inputs.length).toBeGreaterThanOrEqual(2);
   });
 
   it('should not call login on invalid form submission', () => {
     component.onSubmit();
     expect(userServiceSpy.login).not.toHaveBeenCalled();
+    expect(component.submitted).toBe(true);
   });
 
-  it('should call userService.login on valid form submission', () => {
+  it('should call userService.login and navigate on valid submission', () => {
     userServiceSpy.login.mockReturnValue(of('jwt-token'));
+    jest.spyOn(router, 'navigate');
     component.loginForm.setValue({ login: 'user', password: 'pass' });
     component.onSubmit();
     expect(userServiceSpy.login).toHaveBeenCalled();
+    expect(authServiceSpy.saveToken).toHaveBeenCalledWith('jwt-token');
+    expect(router.navigate).toHaveBeenCalledWith(['/']);
+  });
+
+  it('should display error message on login failure', () => {
+    userServiceSpy.login.mockReturnValue(throwError(() => ({ error: { message: 'Identifiants invalides' } })));
+    component.loginForm.setValue({ login: 'user', password: 'bad' });
+    component.onSubmit();
+    expect(component.errorMessage).toBe('Identifiants invalides');
+    expect(component.loading).toBe(false);
+  });
+
+  it('should display default error when no message in response', () => {
+    userServiceSpy.login.mockReturnValue(throwError(() => ({ error: null })));
+    component.loginForm.setValue({ login: 'user', password: 'bad' });
+    component.onSubmit();
+    expect(component.errorMessage).toBe('Erreur lors de la connexion');
+  });
+
+  it('should reset form and clear errors on onReset', () => {
+    component.submitted = true;
+    component.errorMessage = 'erreur';
+    component.onReset();
+    expect(component.submitted).toBe(false);
+    expect(component.errorMessage).toBe('');
   });
 });
