@@ -1,59 +1,82 @@
 # EtudiantFrontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.16.
+Frontend Angular de l'application EtuBibliothèque — interface de gestion des étudiants abonnés à une bibliothèque.
 
-## Development server
+## Stack technique
 
-To start a local development server, run:
+- Angular 19.2 (standalone components)
+- Angular Material 19.2
+- TypeScript 5.7
+- Jest 29.7 (tests unitaires)
+- Cypress 15.13 (tests E2E)
 
-```bash
-ng serve
-```
+## Pré-requis
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Node.js 18+ et npm
+- Backend Spring Boot démarré sur le port 8080
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Démarrage du serveur de développement
 
 ```bash
-ng generate --help
+npm install
+npm start
 ```
 
-## Building
+L'application est accessible sur `http://localhost:4200/`. Les appels API vers `/api/*` sont redirigés vers le backend via le proxy (`proxy.conf.json`).
 
-To build the project run:
+## Fonctionnalités
+
+- Inscription et connexion avec authentification JWT
+- Guard de route : redirection vers `/login` si non authentifié
+- Intercepteur HTTP : injection automatique du token Bearer
+- CRUD complet des étudiants (liste, création, modification, suppression)
+- Validation des formulaires (reactive forms)
+- Dialogue de confirmation pour la suppression
+
+## Build de production
 
 ```bash
-ng build
+npm run build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Les fichiers compilés sont générés dans le répertoire `dist/`.
 
-## Running unit tests
-
-To execute unit tests with the [Jest](https://jestjs.io/) test runner, use the following command:
+## Tests unitaires (Jest)
 
 ```bash
-jest
+npm test
 ```
 
-## Running end-to-end tests
+- 58 tests unitaires couvrant services, guards, intercepteurs et composants
+- Seuil de couverture configuré à 80% (branches, fonctions, lignes, statements)
+- Rapport de couverture : `coverage/jest/index.html`
 
-For end-to-end (e2e) testing, run:
+### Couverture Jest
+
+| Métrique   | Couverture | Détail  |
+|------------|-----------|---------|
+| Statements | **99,04%** | 311/314 |
+| Branches   | **93,10%** | 27/29   |
+| Functions  | **94,64%** | 53/56   |
+| Lines      | **98,96%** | 288/291 |
+
+## Tests end-to-end (Cypress)
+
+Le backend et le frontend doivent être démarrés avant de lancer les tests E2E.
 
 ```bash
-ng e2e
+npm run cypress:open    # mode interactif
+npm run cypress:run     # mode headless (CI)
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+- 20 tests E2E couvrant l'authentification et le CRUD étudiants
+- Rapport de couverture : `coverage/cypress/index.html`
 
-## Additional Resources
+### Couverture Cypress
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+| Métrique   | Couverture | Détail  |
+|------------|-----------|---------|
+| Statements | **93,92%** | 526/560 |
+| Branches   | **87,41%** | 125/143 |
+| Functions  | **92,85%** | 78/84   |
+| Lines      | **94,64%** | 371/392 |

@@ -94,12 +94,13 @@ Dans l'onglet ```Exec```, il faut :
     use etudiant_db;
     ```
   
-3. Vérifier que la table `user` existe (elle est néanmoins vide pour le moment).
+3. Vérifier que les tables `user` et `student` existent (elles sont néanmoins vides pour le moment).
 
     ```
+    show tables;
     select * from user;
+    select * from student;
     ```
-    Le résultat devrait être : `Empty set (0.00 sec)`
 
 La capture d'écran ci-dessous résume les étapes précédentes : 
 
@@ -107,25 +108,45 @@ La capture d'écran ci-dessous résume les étapes précédentes :
 
 
 ## Exécution des tests
-Pour exécuter les tests Junit, il faut :
-- avoir démarré Docker-Desktop sur votre poste de travail local. Cette étape est nécessaire car les tests d'intégration auront besoin de Docker pour créer des bases de données temporaires de test.
+Pour exécuter les tests JUnit, il faut :
+- avoir démarré Docker-Desktop sur votre poste de travail local. Cette étape est nécessaire car les tests d'intégration utilisent TestContainers pour créer des bases de données MySQL temporaires.
 - dans une console, se placer à la racine du projet et exécuter la commande Maven suivante :
 
 ```
 mvn clean test
 ```
 
+Pour générer le rapport de couverture JaCoCo :
+
+```
+mvn clean verify
+```
+
+Le rapport HTML est disponible dans `target/site/jacoco/index.html`.
+
+### Couverture JaCoCo
+
+| Métrique     | Couverture | Détail       |
+|--------------|-----------|--------------|
+| Instructions | **100%**   | 777/777      |
+| Branches     | **92%**    | 26/28        |
+| Lignes       | **100%**   | 159/159      |
+| Méthodes     | **100%**   | 58/58        |
+| Classes      | **100%**   | 12/12        |
+
+> Les métriques ci-dessus nécessitent Docker Desktop pour l'exécution complète (tests d'intégration avec TestContainers).
+
 ## Fonctionnalités portées
 
-    - API de création d'un utilisateur (agent de la bibliothèque)
-    - API d'authentification d'un utilisateur (à faire)
-    - APIs CRUD des étudiants de la bibliothèque (à faire)
-
-
-## Écrans ou blocs concernés
-    - Ecran xxx
-    - Ecran xxx
-    - Ecran xxx
-
-
+- API d'inscription d'un utilisateur (`POST /api/register`)
+- API d'authentification avec JWT (`POST /api/login`)
+- APIs CRUD des étudiants de la bibliothèque :
+  - `POST /api/students` — créer un étudiant
+  - `GET /api/students` — lister tous les étudiants
+  - `GET /api/students/{id}` — consulter un étudiant
+  - `PUT /api/students/{id}` — modifier un étudiant
+  - `DELETE /api/students/{id}` — supprimer un étudiant
+- Gestion centralisée des erreurs (RestExceptionHandler)
+- Sécurité : JWT stateless, filtre d'authentification, CORS
+- Monitoring : Spring Boot Actuator (`/actuator`)
 
